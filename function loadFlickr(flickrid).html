@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Flickr Experiment</title>
+</head>
+
+<body>
+
+    <!-- <button onclick='loadFlickr();'>Click to show Flickr data</button> -->
+
+    <form onsubmit="loadFlickr();"><input type="submit" value="Submit">Click to show Flickr data</form>
+    <br><br>
+    Here is the data...
+    <p id="feed"></p>
+
+
+</body>
+
+</html>
+
+<script type="text/javascript"
+            src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        loadFlickr("29080075@N02");
+    });
+
+
+    function loadFlickr(flickrid)
+    {
+        // Display a loading icon in our display element
+        //$('#feed').html('<span><img src="images/lightbox-ico-loading.gif" /></span>');
+
+        // Request the JSON and process it
+        $.ajax({
+            type:'GET',
+            url:"http://api.flickr.com/services/feeds/photos_public.gne",
+            data:"id="+flickrid+"&lang=en-us&format=json&jsoncallback=?",
+            success:function(flickr_data) {
+                // Create an empty array to store images
+                var thumbs = [];
+
+                // Loop through the items
+                for(var i=0, l=flickr_data.items.length; i < l && i < 100; ++i) 
+                {
+                    // Manipulate the image to get thumb and medium sizes
+                    var img = flickr_data.items[i].media.m.replace(
+                        /^(.*?)_m\.jpg$/, 
+                        '<a href="$1.jpg"><img src="$1_s.jpg" alt="" /></a>'
+                    );
+
+                    // Add the new element to the array
+                    thumbs.push(img);
+                }
+
+                // Display the thumbnails on the page
+                $('#feed').html(thumbs.join(''));
+
+                // A function to add a lightbox effect
+                //addLB();
+            },
+            dataType:'jsonp'
+        });
+    }
+
+</script>
